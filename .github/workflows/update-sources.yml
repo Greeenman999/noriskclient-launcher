@@ -33,9 +33,6 @@ jobs:
         run: |
           python3 flatpak-builder-tools/cargo/flatpak-cargo-generator.py src-tauri/Cargo.lock -o packaging/flatpak/cargo-sources.json
 
-      - name: Install pipx
-        run: sudo apt update && sudo apt install -y pipx
-
       - name: Install flatpak-node-generator
         run: pipx install git+https://github.com/flatpak/flatpak-builder-tools.git#subdirectory=node
 
@@ -59,7 +56,7 @@ jobs:
           fi
 
           if [ -n "$FILES_TO_COMMIT" ] && [[ $(git status --porcelain $FILES_TO_COMMIT) ]]; then
-            git add $FILES_TO_COMMIT
+            git add -- $FILES_TO_COMMIT
             git commit -m "chore: update flatpak dependency manifests"
             git push
           else
