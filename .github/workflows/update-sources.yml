@@ -22,7 +22,9 @@ jobs:
 
       - name: Install tools
         run: |
-          pip install flatpak-cargo-generator flatpak-node-generator
+          sudo apt update && sudo apt install pipx
+          pipx install git+https://github.com/flatpak/flatpak-builder-tools.git#subdirectory=node
+          pipx install git+https://github.com/flatpak/flatpak-builder-tools.git#subdirectory=cargo
 
       - name: Generate cargo-sources.json
         run: flatpak-cargo-generator src-tauri/Cargo.lock -o packaging/flatpak/cargo-sources.json
@@ -37,8 +39,13 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          if [[ `git status --porcelain` ]]; then
-            git add packaging/flatpak/cargo-sources.json packaging/flatpak/node-sources.json || true
+          if [[ $(git status --porcelain) ]]; then
+            if [ -f packaging/flatpak/cargo-sources.json ]; then
+              git add packaging/flatpak/cargo-sources.json
+            fi
+            if [ -f packaging/flatpak/node-sources.json ]; then
+              git add packaging/flatpak/node-sources.json
+            fi
             git commit -m "chore: update flatpak dependency manifests"
             git push
           else
